@@ -3,6 +3,7 @@ var gutil = require("gulp-util");
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var watchify = require("watchify");
+var livereload = require('gulp-livereload');
 var tsify = require('tsify');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
@@ -26,13 +27,6 @@ gulp.task('copyHtml', function () {
 
 function bundle() {
   return watchedBrowserify
-      .bundle()
-      .pipe(source('bundle.js'))
-      .pipe(gulp.dest("dist"));
-}
-
-gulp.task('default', ['copyHtml'], function () {
-  return watchedBrowserify
       .transform('babelify', {
         presets: ['es2015'],
         extensions: ['.ts']
@@ -43,7 +37,10 @@ gulp.task('default', ['copyHtml'], function () {
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(uglify())
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('dist'));
-});
+      .pipe(gulp.dest('dist'))
+      .pipe(livereload({ start: true }));
+}
+
+gulp.task('default', ['copyHtml'], bundle);
 watchedBrowserify.on("update", bundle);
 watchedBrowserify.on("log", gutil.log);
