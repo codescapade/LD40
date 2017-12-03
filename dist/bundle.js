@@ -100,7 +100,49 @@ exports.default = Boot;
 },{"./globals":5}],3:[function(require,module,exports){
 "use strict";
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof8 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _typeof7 = typeof Symbol === "function" && _typeof8(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof8(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof8(obj);
+};
+
+var _typeof6 = typeof Symbol === "function" && _typeof7(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof7(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof7(obj);
+};
+
+var _typeof5 = typeof Symbol === "function" && _typeof6(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof6(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof6(obj);
+};
+
+var _typeof4 = typeof Symbol === "function" && _typeof5(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof5(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof5(obj);
+};
+
+var _typeof3 = typeof Symbol === "function" && _typeof4(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof4(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof4(obj);
+};
+
+var _typeof2 = typeof Symbol === "function" && _typeof3(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof3(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof3(obj);
+};
+
+var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+    return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+} : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+};
 
 var _createClass = function () {
     function defineProperties(target, props) {
@@ -144,7 +186,7 @@ var Game = function (_Phaser$State) {
         var _this = _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).apply(this, arguments));
 
         _this._timer = 0;
-        _this._delay = 350;
+        _this._delay = 250;
         _this._desiredRotation = 0;
         _this._desiredDirection = new Phaser.Point(1, 0);
         _this._currentDirection = new Phaser.Point(1, 0);
@@ -161,40 +203,9 @@ var Game = function (_Phaser$State) {
             this._map.addTilesetImage('tiles');
             this._mapLayer = this._map.createLayer(0);
             this._mapLayer.resizeWorld();
-            var snakePos = new Phaser.Point();
-            var foundPos = false;
-            var rndX = void 0;
-            var rndY = void 0;
-            while (!foundPos) {
-                rndX = this.game.rnd.between(0, this._map.width - 1);
-                rndY = this.game.rnd.between(0, this._map.height - 1);
-                if (rndX - 3 >= 0 && rndX + 3 < this._map.width - 1) {
-                    foundPos = true;
-                    for (var i = rndX - 3; i <= rndX + 3; i++) {
-                        if (this._map.getTile(i, rndY, 0).index != 0) {
-                            foundPos = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            console.log('head x: ' + rndX + ', y: ' + rndY);
-            this._snake = new baseSprite_1.default(this.game, rndX, rndY, 'head');
-            this._bodyGroup = this.add.group();
-            this._bodyGroup.classType = baseSprite_1.default;
-            for (var _i = 0; _i < 100; _i++) {
-                var part = new baseSprite_1.default(this.game, 0, 0, 'body');
-                part.kill();
-                this._bodyGroup.add(part);
-            }
-            var snakeGridPos = this._snake.gridPosition;
-            this._body = [];
-            for (var _i2 = 1; _i2 < 3; _i2++) {
-                var bodyPart = this._bodyGroup.getFirstExists(false);
-                bodyPart.revive();
-                bodyPart.updatePosition(snakeGridPos.x - _i2, snakeGridPos.y);
-                this._body.push(bodyPart);
-            }
+            this.createSnake();
+            this._food = new baseSprite_1.default(this.game, 0, 0, 'food');
+            this.updateFood();
             this.game.camera.follow(this._snake, Phaser.Camera.FOLLOW_TOPDOWN_TIGHT);
             this._leftKey = this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
             this._rightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
@@ -233,6 +244,43 @@ var Game = function (_Phaser$State) {
         } // render
 
     }, {
+        key: "createSnake",
+        value: function createSnake() {
+            var snakePos = new Phaser.Point();
+            var foundPos = false;
+            var rndX = void 0;
+            var rndY = void 0;
+            while (!foundPos) {
+                rndX = this.game.rnd.between(0, this._map.width - 1);
+                rndY = this.game.rnd.between(0, this._map.height - 1);
+                if (rndX - 3 >= 0 && rndX + 3 < this._map.width - 1) {
+                    foundPos = true;
+                    for (var i = rndX - 3; i <= rndX + 3; i++) {
+                        if (this._map.getTile(i, rndY, 0).index != 0) {
+                            foundPos = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            this._snake = new baseSprite_1.default(this.game, rndX, rndY, 'head');
+            this._bodyGroup = this.add.group();
+            this._bodyGroup.classType = baseSprite_1.default;
+            for (var _i = 0; _i < 100; _i++) {
+                var part = new baseSprite_1.default(this.game, 0, 0, 'body');
+                part.kill();
+                this._bodyGroup.add(part);
+            }
+            var snakeGridPos = this._snake.gridPosition;
+            this._body = [];
+            for (var _i2 = 1; _i2 < 3; _i2++) {
+                var bodyPart = this._bodyGroup.getFirstExists(false);
+                bodyPart.revive();
+                bodyPart.updatePosition(snakeGridPos.x - _i2, snakeGridPos.y);
+                this._body.push(bodyPart);
+            }
+        }
+    }, {
         key: "updateSnake",
         value: function updateSnake() {
             var difference = Phaser.Point.add(this._desiredDirection, this._currentDirection);
@@ -246,16 +294,55 @@ var Game = function (_Phaser$State) {
             if (this._map.getTile(newX, newY, 0).index != 0) {
                 return;
             }
+            var hitSelf = false;
+            for (var i = 0; i < this._body.length; i++) {
+                var body = this._body[i];
+                if (body.gridPosition.x == newX && body.gridPosition.y == newY) {
+                    hitSelf = true;
+                    break;
+                }
+            }
+            if (hitSelf) {
+                return;
+            }
             this._snake.updatePosition(newX, newY);
-            var lastBodyPart = this._body.pop();
-            lastBodyPart.updatePosition(oldPos.x, oldPos.y);
-            this._body.unshift(lastBodyPart);
+            if (this._food.gridPosition.equals(this._snake.gridPosition)) {
+                var newPart = this._bodyGroup.getFirstExists(false);
+                newPart.revive();
+                newPart.updatePosition(oldPos.x, oldPos.y);
+                this._body.unshift(newPart);
+                this.updateFood();
+            } else {
+                var lastBodyPart = this._body.pop();
+                lastBodyPart.updatePosition(oldPos.x, oldPos.y);
+                this._body.unshift(lastBodyPart);
+            }
         } // updateSnake
 
     }, {
         key: "updateFood",
         value: function updateFood() {
             var emptyPosition = false;
+            var rndX = void 0;
+            var rndY = void 0;
+            while (!emptyPosition) {
+                rndX = this.game.rnd.between(0, this._map.width - 1);
+                rndY = this.game.rnd.between(0, this._map.height - 1);
+                if (this._map.getTile(rndX, rndY, 0).index == 0) {
+                    emptyPosition = true;
+                    if (this._snake.gridPosition.x == rndX && this._snake.gridPosition.y == rndY) {
+                        emptyPosition = false;
+                    }
+                    for (var i = 0; i < this._body.length; i++) {
+                        var body = this._body[i];
+                        if (body.gridPosition.x == rndX && body.gridPosition.y == rndY) {
+                            emptyPosition = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            this._food.updatePosition(rndX, rndY);
         } // updateFood
 
     }]);
