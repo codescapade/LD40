@@ -14,9 +14,12 @@ class Main extends Phaser.Game {
     this.state.add('game', Game);
 
     this.state.start('boot');
-  }
-}
+
+  } // constructor
+
+} // Main
 
 window.onload = () => {
   new Main();
-};
+
+}; // window.onload
