@@ -1,17 +1,15 @@
 
-import Boot from './boot';
-import Preload from './preload';
-import Game from './game';
+import { BootState } from './states/bootState';
+import { PreloadState } from './states/preloadState';
+import { GameState } from './states/gameState';
 
 class Main extends Phaser.Game {
-  public test: 'testing';
-
   constructor () {
     super(640, 480, Phaser.AUTO, 'container', null);
 
-    this.state.add('boot', Boot);
-    this.state.add('preload', Preload);
-    this.state.add('game', Game);
+    this.state.add('boot', BootState);
+    this.state.add('preload', PreloadState);
+    this.state.add('game', GameState);
 
     this.state.start('boot');
 
@@ -21,5 +19,5 @@ class Main extends Phaser.Game {
 
 window.onload = () => {
   new Main();
-
+  console.log('window loaded');
 }; // window.onload

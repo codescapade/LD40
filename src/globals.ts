@@ -1,4 +1,4 @@
-export default class Globals {
+export class Globals {
   public static readonly TILESIZE:number = 20;
   
   public static seed:number = 0;
@@ -11,4 +11,11 @@ export default class Globals {
     return new Phaser.Point(x * Globals.TILESIZE + Globals.TILESIZE * 0.5,
       y * Globals.TILESIZE + Globals.TILESIZE * 0.5);
   }
+}
+
+export enum SpriteType {
+  BODY,
+  HEAD,
+  BULLET,
+  NONE
 }

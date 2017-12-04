@@ -1,6 +1,6 @@
-import Globals from './globals';
+import { Globals } from '../globals';
 
-export default class Boot extends Phaser.State {
+export class BootState extends Phaser.State {
   public preload ():void {
     this.stage.disableVisibilityChange = false;
     this.stage.smoothed = false;

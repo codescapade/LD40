@@ -1,10 +1,8 @@
 
-
-export default class Generator {
+export class Generator {
   private _width:number;
   private _height:number;
   private _game:Phaser.Game;
-
   private _map:number[][];
 
   constructor(game:Phaser.Game, width:number, height:number) {
@@ -24,8 +22,8 @@ export default class Generator {
   } // constructor
 
   public buildMap (nrRooms:number, minSize:number, maxSize:number, minOverlap:number, maxOverlap:number):string {
-    let room:Phaser.Rectangle = this.getRndRoom(minSize, maxSize, true);
-    this.createRoom(room);
+    let room:Phaser.Rectangle = this._getRndRoom(minSize, maxSize, true);
+    this._createRoom(room);
 
     let totalRooms:number = 1;
 
@@ -36,24 +34,26 @@ export default class Generator {
       timesTried = 0;
       foundPlace = false;
       while(!foundPlace && timesTried < totalTries) {
-        room = this.getRndRoom(minSize, maxSize, false);
-        let overlap:number = this.countTiles(room);
+        room = this._getRndRoom(minSize, maxSize, false);
+        let overlap:number = this._countTiles(room);
         if (overlap >= minOverlap && overlap <= maxOverlap) {
           foundPlace = true;
-          this.createRoom(room);
+          this._createRoom(room);
         }
         timesTried++;
       }
       totalRooms++;
     }
 
-    this.removeDoubleWalls();
+    this._removeDoubleWalls();
+    this._setOuterWalls();
+    this._setGoal();
 
-    return this.getCSV();
+    return this._getCSV();
 
   } // buildMap
 
-  private getRndRoom (minSize:number, maxSize:number, firstRoom:boolean):Phaser.Rectangle {
+  private _getRndRoom (minSize:number, maxSize:number, firstRoom:boolean):Phaser.Rectangle {
     let roomWidth:number = this._game.rnd.between(minSize, maxSize);
     let roomHeight:number = this._game.rnd.between(minSize, maxSize);
     let x:number;
@@ -70,7 +70,7 @@ export default class Generator {
 
   } // getRndRoom
 
-  private countTiles (room:Phaser.Rectangle):number {
+  private _countTiles (room:Phaser.Rectangle):number {
     let count = 0;
     for (let y = room.y; y < room.y + room.height; y++) {
       for (let x = room.x; x < room.x + room.width; x++) {
@@ -84,7 +84,7 @@ export default class Generator {
 
   } // countTiles
 
-  private createRoom (room:Phaser.Rectangle):void {
+  private _createRoom (room:Phaser.Rectangle):void {
     for (let y = room.y; y < room.y + room.height; y++) {
       for (let x = room.x; x < room.x + room.width; x++) {
         this._map[y][x] = 0;
@@ -92,7 +92,7 @@ export default class Generator {
     }
   } // createRoom
 
-  private allNeigborsAreWalls (x:number, y:number):boolean {
+  private _allNeigborsAreWalls (x:number, y:number):boolean {
     if (x - 1 >= 0 && y - 1 >= 0 && this._map[y - 1][x - 1] == 0) {
       return false;
     }
@@ -129,11 +129,11 @@ export default class Generator {
 
   } // allNeighborsAreWalls
 
-  private removeDoubleWalls ():void {
+  private _removeDoubleWalls ():void {
     let wallsToRemove:Phaser.Point[] = [];
     for (let y = 0; y < this._height; y++) {
       for (let x = 0; x < this._width; x++) {
-        if (this.allNeigborsAreWalls(x, y)) {
+        if (this._allNeigborsAreWalls(x, y)) {
           wallsToRemove.push(new Phaser.Point(x, y));
         }
       }
@@ -146,7 +146,44 @@ export default class Generator {
 
   } // remvoeDoubleWalls
 
-  private getCSV ():string {
+  private _setOuterWalls ():void {
+    for (let y = 0; y < this._height; y++) {
+      for (let x = 0; x < this._width; x++) {
+        if (x == 0 || x == this._width - 1 || y == 0 || y == this._height - 1) {
+          if (this._map[y][x] == 1) {
+            this._map[y][x] = 3;
+          }
+        }
+      }
+    }
+
+  } // _setOuterwalls
+
+  private _setGoal ():void {
+    let foundPosition:boolean = false;
+    let rndX:number = 0;
+    let rndY:number = 0;
+    while (!foundPosition) {
+      rndX = this._game.rnd.between(1, this._width - 2);
+      rndY = this._game.rnd.between(1, this._height - 2);
+      if (this._map[rndY][rndX] == 0) {
+        foundPosition = true;
+        for (let y = rndY - 1; y <= rndY + 1; y++) {
+          for (let x = rndX - 1; x <= rndX + 1; x++) {
+            if (this._map[y][x] != 0) {
+              foundPosition = false;
+            }
+          }
+        }
+        
+      }
+    }
+
+    this._map[rndY][rndX] = 4;
+
+  } // _setGoal
+
+  private _getCSV ():string {
     let csvString:string = '';
     for (let y = 0; y < this._height; y++) {
       for (let x = 0; x < this._width; x++) {
@@ -162,3 +199,7 @@ export default class Generator {
   } // getCSV
 
 } // Generator
+
+export class Level {
+
+}

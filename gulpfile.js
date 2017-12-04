@@ -25,6 +25,26 @@ gulp.task('copyHtml', function () {
       .pipe(gulp.dest('dist'));
 });
 
+function test () {
+  return browserify({
+    basedir: '.',
+    debug: true,
+    entries: ['src/main.ts'],
+    cache: {},
+    packageCache: {}
+  }).plugin(tsify)
+  .transform('babelify', {
+    presets: ['es2015'],
+    extensions: ['.ts']
+  })
+  .bundle()
+  .pipe(source('bundle.js'))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(sourcemaps.write('./'))
+  .pipe(gulp.dest('dist'))
+}
+
 function bundle() {
   return watchedBrowserify
       .transform('babelify', {
@@ -41,6 +61,7 @@ function bundle() {
       .pipe(livereload({ start: true }));
 }
 
+gulp.task('test', test);
 gulp.task('default', ['copyHtml'], bundle);
 watchedBrowserify.on("update", bundle);
 watchedBrowserify.on("log", gutil.log);
