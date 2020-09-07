@@ -62,6 +62,6 @@ function bundle() {
 }
 
 gulp.task('test', test);
-gulp.task('default', ['copyHtml'], bundle);
+gulp.task('default', gulp.series('copyHtml'), bundle);
 watchedBrowserify.on("update", bundle);
 watchedBrowserify.on("log", gutil.log);
